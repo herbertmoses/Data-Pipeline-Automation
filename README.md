@@ -1,3 +1,4 @@
+![CI](https://github.com/herbertmoses/Data-Pipeline-Automation/actions/workflows/ci.yml/badge.svg)
 # 🚀 End-to-End ETL Automation Pipeline (PostgreSQL + Python)
 
 ## 📌 Overview
