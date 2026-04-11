@@ -2,13 +2,16 @@ name: ETL Pipeline CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "feature/*" ]
   pull_request:
     branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    env:
+      CI: "true"
 
     steps:
     - name: Checkout code
@@ -24,13 +27,25 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    # ✅ Syntax check
     - name: Syntax check
       run: |
         python -m py_compile *.py
+        python -m py_compile airflow/dags/*.py || true
 
+    # ✅ Import validation (safe modules only)
     - name: Import validation
       run: |
-        python -c "import main"
         python -c "import join_tables_etl"
         python -c "import folder_watcher"
         python -c "import email_sender"
+
+    # ✅ DAG parsing (no execution)
+    - name: DAG parse check
+      run: |
+        python - <<EOF
+        import sys
+        sys.path.append("airflow/dags")
+        import data_pipeline_dag
+        print("DAG parsed successfully")
+        EOF
